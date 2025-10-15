@@ -145,6 +145,11 @@ class UrbanTrip(BaseAgent):
         return success, plan
 
     def generate_plan_with_search(self, query):
+        '''1.初始化阶段：
+
+            设置计时器和各种计数器（回溯次数、搜索节点数等）
+            初始化存储结构（正在访问的景点、餐厅等列表）
+            提取用户约束条件（景点偏好、餐厅偏好、预算限制等）'''
         # 初始化计时器和计数器
         self.time_before_search = time.time()  # 记录搜索开始时间
         self.llm_inference_time_count = 0  # llm推理时间
@@ -172,7 +177,13 @@ class UrbanTrip(BaseAgent):
         self.least_plan_schema, self.least_plan_comm, self.least_plan_logic = None, None, None
         self.least_plan_logical_pass = -1
         # 提取用户需求
-        # 获取用户约束信息
+        '''2.约束提取：
+            从查询中提取各种约束条件，包括：
+            必须/禁止访问的景点和餐厅
+            住宿偏好和限制
+            时间约束（到达/离开时间）
+            预算限制（各项花费预算）
+            交通方式偏好'''
         # constraints_json = self.extract_user_constraints(query)
         constraints_json, requirement_list = self.extract_user_constraints_by_DSL(query)
 
@@ -237,6 +248,7 @@ class UrbanTrip(BaseAgent):
             "itinerary": [],
         }
 
+        # 引入了基于距离的交通方式选择：
         if self.transport_rules_by_distance is not None:
             if isinstance(self.transport_rules_by_distance, str):
                     self.transport_rules_by_distance = json.loads(self.transport_rules_by_distance)
@@ -268,7 +280,11 @@ class UrbanTrip(BaseAgent):
 
         print(f"query room number: {query_room_number}")
         print(f"query room numbed: {query_room_numbed}")
+        '''3.数据收集：
 
+            收集城际交通选项（火车、飞机）
+            收集酒店信息
+            根据用户约束对这些选项进行排序'''
         # 收集去程和返程的城际火车交通选项
         train_go = self.collect_intercity_transport(source_city, target_city, "train")
         train_back = self.collect_intercity_transport(target_city, source_city, "train")
@@ -353,7 +369,12 @@ class UrbanTrip(BaseAgent):
                 t for t in self.innercity_transports_ranking
                 if t not in self.must_not_innercity_transport
             ]
+        '''4.搜索策略：
 
+            采用分层搜索策略，依次确定：
+            去程交通方式
+            返程交通方式
+            住宿地点'''
         # 遍历排序后的去程交通
         intercity_budget_msg = "intercity budget not satisfied, backtrack..."
         intercity_budget_count = 0
@@ -548,6 +569,11 @@ class UrbanTrip(BaseAgent):
                                 continue
 
                         print("search: ...")
+                        '''
+                            5.回溯机制：
+                            对每种组合调用 dfs_poi 进行详细的逐日规划
+                            如果某个组合无法生成完整计划，则回溯尝试其他组合
+                            设置时间限制，避免搜索时间过长'''
                         # 尝试通过 DFS 搜索 POI 计划
                         try:
                             success, plan = self.dfs_poi(

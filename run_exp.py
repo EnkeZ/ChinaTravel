@@ -155,7 +155,8 @@ if __name__ == "__main__":
 
         elif args.agent in ["LLMNeSy", "RuleNeSy"]:
             succ, plan = agent.run(query_i, load_cache=True, oralce_translation=args.oracle_translation, preference_search=args.preference_search)
-        
+        elif args.agent == "UrbanTrip":
+            succ, plan = agent.run(query_i,oralce_translation=args.oracle_translation, preference_search=args.preference_search)
         elif args.agent == "TPCAgent":
             succ, plan = agent.run(query_i, prob_idx=data_idx, oralce_translation=args.oracle_translation)
 

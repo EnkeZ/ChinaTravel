@@ -11,7 +11,7 @@ def init_agent(kwargs):
     )
 
     from .nesy_verifier import LLMModuloAgent
-
+    from .UrbanTrip.tpc_agent import UrbanTrip
     from .tpc_agent.tpc_agent import TPCAgent
 
     if kwargs["method"] == "RuleNeSy":
@@ -55,6 +55,10 @@ def init_agent(kwargs):
         kwargs["model"] = kwargs["backbone_llm"]
         kwargs["max_steps"] = kwargs["refine_steps"]
         agent = LLMModuloAgent(
+            **kwargs
+        )
+    elif kwargs["method"] == "UrbanTrip":
+        agent = UrbanTrip(
             **kwargs
         )
     elif kwargs["method"] == "TPCAgent":
