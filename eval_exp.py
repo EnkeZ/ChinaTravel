@@ -78,6 +78,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--method", "-m", type=str, default="example"
     )  # , choices=METHOD_LIST)
+    parser.add_argument('--oracle_translation', action='store_true',default=True,help='Set this flag to enable oracle translation.')
     parser.add_argument("--preference", "-p", action="store_true", default=False)
     args = parser.parse_args()
 

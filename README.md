@@ -145,6 +145,10 @@ python run_exp.py --splits human --agent LLM-modulo --llm Qwen3-8B --refine_step
 ### 📊 Evaluation
 
 ```bash
+新的评估方法
+python eval_exp.py --splits human --method UrbanTrip_Qwen3-4B_oracletranslation
+python eval_exp.py --splits human --method UrbanTrip_Qwen3-8B_oracletranslation
+
 python eval_exp.py --splits human --method LLMNeSy_deepseek_oracletranslation
 python eval_exp.py --splits human --method LLMNeSy_deepseek
 python eval_exp.py --splits human --method LLM-modulo_deepseek_10steps_oracletranslation

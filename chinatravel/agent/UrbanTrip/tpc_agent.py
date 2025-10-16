@@ -3143,9 +3143,9 @@ class UrbanTrip(BaseAgent):
             logical_pass = logical_pass and item
 
             if item:
-                print(query["hard_logic_py"][idx], "passed!")
+                print(query["hard_logic_py"][idx], "passed constraints_validation!")
             else:
-                print(query["hard_logic_py"][idx], "failed...")
+                print(query["hard_logic_py"][idx], "failed constraints_validation...")
         if bool_result and np.sum(logical_result) > self.least_plan_logical_pass:
             self.least_plan_comm = deepcopy(res_plan)
             self.least_plan_logical_pass = np.sum(logical_result)
