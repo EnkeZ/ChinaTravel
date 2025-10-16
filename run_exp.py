@@ -29,7 +29,7 @@ if __name__ == "__main__":
     )
     parser.add_argument("--index", "-id", type=str, default=None, help="query index")
     parser.add_argument(
-        "--skip", "-sk", type=int, default=0, help="skip if the plan exists"
+        "--skip", "-sk", type=int, default=1, help="skip if the plan exists"
     )
     parser.add_argument('--restart_from', type=str, default=None, help='Restart Data ID')
     parser.add_argument(
@@ -126,6 +126,7 @@ if __name__ == "__main__":
         )
         print("data uid: ", data_idx)
 
+        # 跳过已经算过的结果
         if args.skip and os.path.exists(os.path.join(res_dir, f"{data_idx}.json")):
             continue
         if i in white_list:

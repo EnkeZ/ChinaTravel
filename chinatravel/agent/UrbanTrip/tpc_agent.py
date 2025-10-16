@@ -346,7 +346,11 @@ class UrbanTrip(BaseAgent):
 
             print(go_info.head())
             print(back_info.head())
-
+            
+        # 如果没有火车和飞机交通，则返回搜索失败
+        if train_go_num + flight_go_num == 0 or train_back_num + flight_back_num == 0:
+            return False, {"error_info": "没有可行的交通方式."}
+        
         # 对去程城际交通进行排序
         ranking_go = self.ranking_intercity_transport_go(go_info, query)
 
