@@ -20,7 +20,7 @@ if project_root_path not in sys.path:
     sys.path.insert(0, project_root_path)
 
 from agent.base import AbstractAgent, BaseAgent
-from utils import (
+from .utils import (
     time_compare_if_earlier_equal,
     calc_cost_from_itinerary_wo_intercity,
     add_time_delta,

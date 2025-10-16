@@ -9,7 +9,7 @@ scikit-learn==1.6
 modelscope==1.27
 packaging==24.2
 transformers==4.53.2
-z3==0.2.0
+# z3==0.2.0
 vllm==0.8.5
 fuzzywuzzy==0.18.0
 matplotlib==3.9.4
