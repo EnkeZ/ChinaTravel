@@ -118,6 +118,10 @@ if __name__ == "__main__":
         if not os.path.exists("eval_res/splits_{}/{}/".format(args.splits, method)):
             os.makedirs("eval_res/splits_{}/{}/".format(args.splits, method))
 
+        # Create a file to save evaluation metrics
+        metrics_file = "eval_res/splits_{}/{}/metrics.txt".format(args.splits, method)
+        metrics_content = []
+
         schema_rate, schema_result_agg, schema_pass_id = evaluate_schema_constraints(
             query_index, result_data[method], schema=schema
         )
@@ -125,6 +129,8 @@ if __name__ == "__main__":
         schema_result_agg.to_csv(res_file, index=False)
         print("save to {}".format(res_file))
         print("Schema Pass Rate:", schema_rate)
+        
+        metrics_content.append("Schema Pass Rate: {}".format(schema_rate))
 
         macro_comm, micro_comm, common_result_agg, commonsense_pass_id = evaluate_commonsense_constraints(
             query_index, query_data, result_data[method], verbose=False
@@ -138,6 +144,9 @@ if __name__ == "__main__":
         print("micro accuracy: {}".format(micro_comm))
         print("macro accuracy: {}".format(macro_comm))
 
+        metrics_content.append("Commonsense constraints:")
+        metrics_content.append("micro accuracy: {}".format(micro_comm))
+        metrics_content.append("macro accuracy: {}".format(macro_comm))
 
         # print("Logical constraints (flat version):")
         # macro_logi, micro_logi, logi_result_agg, logi_pass_id_flat = evaluate_hard_constraints(
@@ -159,12 +168,17 @@ if __name__ == "__main__":
 
         print("micro accuracy: {}".format(micro_logi))
         print("macro accuracy: {}".format(macro_logi))
+        metrics_content.append("Logical constraints (python version):")
+        metrics_content.append("micro accuracy: {}".format(micro_logi))
+        metrics_content.append("macro accuracy: {}".format(macro_logi))
 
         print("conditional micro accuracy: {}".format(conditional_micro_logi))
         print("conditional macro accuracy: {}".format(conditional_macro_logi))
-
+        metrics_content.append("conditional micro accuracy: {}".format(conditional_micro_logi))
+        metrics_content.append("conditional macro accuracy: {}".format(conditional_macro_logi))
 
         print("Conditional LPR: {}".format(conditional_micro_logi))
+        metrics_content.append("Conditional LPR: {}".format(conditional_micro_logi))
 
         res_file = "eval_res/splits_{}/{}/logical_py.csv".format(args.splits, method)
         logi_result_agg.to_csv(res_file, index=False)
@@ -177,9 +191,10 @@ if __name__ == "__main__":
         all_pass_id = list(set(schema_pass_id) & set(commonsense_pass_id) & set(logi_pass_id))
 
 
+        fpr = 1. * len(all_pass_id) / len(query_index) * 100
+        print("All pass ratio: ", fpr)
+        metrics_content.append("All pass ratio: {}".format(fpr))
 
-        print("All pass ratio: ", 1. * len(all_pass_id) / len(query_index) * 100)
-        
         if args.preference:
             print("Preference:")
             result_agg = evaluate_preference_v2(
@@ -188,9 +203,19 @@ if __name__ == "__main__":
                 result_data[method],
                 list(set(commonsense_pass_id) & set(logi_pass_id)),
             )
-
+            print(result_agg)
             res_file = "eval_res/splits_{}/{}/preference.csv".format(
                 args.splits, method
             )
             result_agg.to_csv(res_file, index=False)
             print("save to {}".format(res_file))
+            metrics_content.append("Preference: {}".format(result_agg))
+        print("Overall Score = 10% * EPR-micro + 10% * EPR-macro + 25% * C-LPR + 40% * FPR + 5% DAV-Score + 5% ATT-Score + 5% DDR-Score")
+        print("Overall Score: {}".format(0.1 * micro_comm + 0.1 * macro_comm + 0.25 * conditional_micro_logi + 0.4 * micro_logi + 0.05 * 0.5 + 0.05 * 0.5 + 0.05 * 0.5))")
+        # Save metrics to txt file
+        with open(metrics_file, 'w', encoding='utf-8') as f:
+            f.write("Evaluation Metrics for method: {}\n".format(method))
+            f.write("Split: {}\n\n".format(args.splits))
+            for line in metrics_content:
+                f.write(line + '\n')
+        print("Metrics saved to {}".format(metrics_file))

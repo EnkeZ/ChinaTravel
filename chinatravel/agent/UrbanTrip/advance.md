@@ -1,5 +1,9 @@
+# 我们可以尝试的改进点
+## 偏好数据
+UrbanTrip只考虑了hard_logic_py，没有考虑preference_py。
 
-# 1.约束提取和解析的改进
+# UrbanTrip的改进
+## 1.约束提取和解析的改进
 
 引入了专门的约束解析方法 extract_user_constraints_by_DSL，提前筛选出最常用的约束，并使用这些约束进行搜索。
 

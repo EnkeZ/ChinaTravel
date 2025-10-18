@@ -93,6 +93,8 @@ We support the deepseek (offical API from deepseek), gpt-4o (chatgpt-4o-latest),
 最新的命令
 python run_exp.py --splits human --agent UrbanTrip --llm Qwen3-4B --oracle_translation
 python run_exp.py --splits human --agent UrbanTrip --llm Qwen3-8B --oracle_translation
+python run_exp.py --splits preference0_base50 --agent UrbanTrip --llm Qwen3-4B --oracle_translation --preference_search
+python run_exp.py --splits preference0_base50 --agent UrbanTrip --llm Qwen3-8B --oracle_translation --preference_search
 
 export OPENAI_API_KEY=""
 
@@ -148,6 +150,8 @@ python run_exp.py --splits human --agent LLM-modulo --llm Qwen3-8B --refine_step
 新的评估方法
 python eval_exp.py --splits human --method UrbanTrip_Qwen3-4B_oracletranslation
 python eval_exp.py --splits human --method UrbanTrip_Qwen3-8B_oracletranslation
+python eval_exp.py --splits preference0_base50 --method UrbanTrip_Qwen3-4B_oracletranslation_preference_search -p
+python eval_exp.py --splits preference0_base50 --method UrbanTrip_Qwen3-8B_oracletranslation_preference_search -p
 
 python eval_exp.py --splits human --method LLMNeSy_deepseek_oracletranslation
 python eval_exp.py --splits human --method LLMNeSy_deepseek

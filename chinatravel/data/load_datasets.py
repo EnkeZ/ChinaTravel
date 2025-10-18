@@ -4,6 +4,8 @@ import json
 import numpy as np
 from datasets import load_dataset as hg_load_dataset
 import ast
+import pandas as pd
+os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
 
 project_root_path = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -27,51 +29,74 @@ class NpEncoder(json.JSONEncoder):
 def load_query_local(args, version="", verbose=False):
     query_data = {}
 
-    # split_config_file = 'default_splits/{}.txt'.format(args.splits)
-
-    split_config_file = os.path.join(
-        project_root_path,
-        "chinatravel",
-        "evaluation",
-        "default_splits",
-        "{}.txt".format(args.splits),
-    )
-
-    print("config file for testing split: {}".format(split_config_file))
-
-    query_id_list = []
-    with open(split_config_file, "r") as f:
-        for line in f.readlines():
-            line = line.strip()
-            query_id_list.append(line)
-
-    if verbose:
-        print(query_id_list)
-
+    # Check if splits refers to a CSV file
+    csv_file_name = "preference{}_base50".format(args.splits[1])
     data_dir = os.path.join(project_root_path, "chinatravel", "data")
+    csv_file_path = os.path.join(data_dir, f"{csv_file_name}.csv")
+    
+    if os.path.exists(csv_file_path):
+        # Load data directly from CSV file
+        df = pd.read_csv(csv_file_path)
+        query_id_list = df['uid'].tolist()
+        
+        # Convert each row to dictionary and store with uid as key
+        for index, row in df.iterrows():
+            query_id = str(row['uid'])
+            # Convert row to dictionary and handle any needed data conversions
+            data_i = row.to_dict()
+            
+            if hasattr(args, 'oracle_translation') and not args.oracle_translation:
+                if "hard_logic" in data_i:
+                    del data_i["hard_logic"]
+                if "hard_logic_py" in data_i:
+                    del data_i["hard_logic_py"]
+                if "hard_logic_nl" in data_i:
+                    del data_i["hard_logic_nl"]
 
-    dir_list = os.listdir(data_dir)
-    for dir_i in dir_list:
-        dir_ii = os.path.join(data_dir, dir_i)
-        if os.path.isdir(dir_ii):
-            file_list = os.listdir(dir_ii)
+            query_data[query_id] = data_i
+    else:
+        # Original logic for non-CSV splits
+        split_config_file = os.path.join(
+            project_root_path,
+            "chinatravel",
+            "evaluation",
+            "default_splits",
+            "{}.txt".format(args.splits),
+        )
 
-            for file_i in file_list:
-                query_id = file_i.split(".")[0]
-                if query_id in query_id_list:
-                    data_i = json.load(
-                        open(os.path.join(dir_ii, file_i), encoding="utf-8")
-                    )
+        print("config file for testing split: {}".format(split_config_file))
 
-                    if hasattr(args, 'oracle_translation') and not args.oracle_translation:
-                        if "hard_logic" in data_i:
-                            del data_i["hard_logic"]
-                        if "hard_logic_py" in data_i:
-                            del data_i["hard_logic_py"]
-                        if "hard_logic_nl" in data_i:
-                            del data_i["hard_logic_nl"]
+        query_id_list = []
+        with open(split_config_file, "r") as f:
+            for line in f.readlines():
+                line = line.strip()
+                query_id_list.append(line)
 
-                    query_data[query_id] = data_i
+        if verbose:
+            print(query_id_list)
+
+        dir_list = os.listdir(data_dir)
+        for dir_i in dir_list:
+            dir_ii = os.path.join(data_dir, dir_i)
+            if os.path.isdir(dir_ii):
+                file_list = os.listdir(dir_ii)
+
+                for file_i in file_list:
+                    query_id = file_i.split(".")[0]
+                    if query_id in query_id_list:
+                        data_i = json.load(
+                            open(os.path.join(dir_ii, file_i), encoding="utf-8")
+                        )
+
+                        if hasattr(args, 'oracle_translation') and not args.oracle_translation:
+                            if "hard_logic" in data_i:
+                                del data_i["hard_logic"]
+                            if "hard_logic_py" in data_i:
+                                del data_i["hard_logic_py"]
+                            if "hard_logic_nl" in data_i:
+                                del data_i["hard_logic_nl"]
+
+                        query_data[query_id] = data_i
 
     # print(query_data)
 
