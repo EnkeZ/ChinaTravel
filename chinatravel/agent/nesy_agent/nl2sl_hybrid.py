@@ -15,7 +15,7 @@ from chinatravel.agent.llms import Deepseek, GPT4o, Qwen, Mistral, GLM4Plus
 from chinatravel.symbol_verification.concept_func import func_dict
 from chinatravel.agent.nesy_agent.prompts import NL2SL_INSTRUCTION
 from chinatravel.agent.nesy_agent.ast_checker import HardLogicPyChecker
-from chinatravel.data.load_datasets import save_json_file, load_json_file
+from chinatravel.data.load_datasets import save_json_file, load_json_file,load_query
 
 
 func_docs = """
@@ -511,30 +511,11 @@ def nl2sl_reflect(query, backbone_llm):
     return query
 
 
-def run(splits: str = "easy_day1", backbone_llm=None, need_check=False):
+def run(args, backbone_llm=None, need_check=False):
     cache_root = "cache_reflect_v1"
-    splits_file = os.path.join(
-        project_path, "chinatravel/evaluation/default_splits/{}.txt".format(splits)
-    )
-    query_dict = {}
-    data_folder = os.path.join(project_path, "chinatravel/data")
-    for root, dirs, files in os.walk(data_folder):
-        for file in files:
-            if file.endswith(".json"):
-                file_path = os.path.join(root, file)
-                query = load_json_file(file_path)
-                uid = file.split(".json")[0]
-                query_dict[uid] = query
-
-    with open(splits_file, "r", encoding="utf-8") as f:
-        query_uid_list = f.readlines()
-    cache_dir = os.path.join(
-        project_path, cache_root, "translation_{}_reflect".format(backbone_llm.name)
-    )
-    if not os.path.exists(cache_dir):
-        os.makedirs(cache_dir)
+    query_id_list, query_dict = load_query(args)
     query_list = []
-    for uid in query_uid_list:
+    for uid in query_id_list:
         uid = uid.strip()
         query_list.append(query_dict[uid])
 
@@ -580,6 +561,7 @@ if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="argparse testing")
     parser.add_argument(
         "--splits",
+        type=str,
         default="easy",
     )
     parser.add_argument(
@@ -594,5 +576,4 @@ if __name__ == "__main__":
     # splits_list = ["cost", "food", "attraction", "hotel", "transport"]
     # splits_list = ["attraction"]
     llm = Qwen(args.llm)
-    for splits in args.splits:
-        run(splits=splits, backbone_llm=llm)
+    run(args, backbone_llm=llm)

@@ -1,11 +1,12 @@
 import sys
 import os
 import json
+os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
 import numpy as np
 from datasets import load_dataset as hg_load_dataset
 import ast
 import pandas as pd
-os.environ['HF_ENDPOINT'] = 'https://hf-mirror.com'
+
 
 project_root_path = os.path.dirname(
     os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -142,13 +143,13 @@ def load_query(args):
     query_id_list = [data_i["uid"] for data_i in query_data]
     data_dict = {}
     for data_i in query_data:
-        if not args.oracle_translation:
-            if "hard_logic" in data_i:
-                del data_i["hard_logic"]
-            if "hard_logic_py" in data_i:
-                del data_i["hard_logic_py"]
-            if "hard_logic_nl" in data_i:
-                del data_i["hard_logic_nl"]
+        # if not args.oracle_translation:
+        #     if "hard_logic" in data_i:
+        #         del data_i["hard_logic"]
+        #     if "hard_logic_py" in data_i:
+        #         del data_i["hard_logic_py"]
+        #     if "hard_logic_nl" in data_i:
+        #         del data_i["hard_logic_nl"]
 
         data_dict[data_i["uid"]] = data_i
 
