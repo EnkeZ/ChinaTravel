@@ -24,4 +24,4 @@ mcp
 scikit-learn>=1.6
 peft==0.14.0
 
--f https://download.pytorch.org/whl/cu124
+# -f https://download.pytorch.org/whl/cu124

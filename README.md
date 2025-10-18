@@ -90,6 +90,8 @@ unzip chinatravel/local_llm/deepseek_v3_tokenizer.zip -d chinatravel/local_llm/
 We support the deepseek (offical API from deepseek), gpt-4o (chatgpt-4o-latest), glm4-plus, and local inferences with Qwen (Qwen3-8B), llama, mistral (Mistral-7B-Instruct-v0.3), etc.
 
 ```bash
+测试nl2sl
+python chinatravel/agent/nesy_agent/nl2sl_hybrid.py --splits human --llm Qwen3-4B
 最新的命令
 python run_exp.py --splits human --agent UrbanTrip --llm Qwen3-4B --oracle_translation
 python run_exp.py --splits human --agent UrbanTrip --llm Qwen3-8B --oracle_translation

@@ -575,12 +575,24 @@ def run(splits: str = "easy_day1", backbone_llm=None, need_check=False):
             if not len(check(query)[0]):
                 print("Run Error in query: ", query["uid"])
 
-
+import argparse
 if __name__ == "__main__":
-    splits_list = ["human"]
+    parser = argparse.ArgumentParser(description="argparse testing")
+    parser.add_argument(
+        "--splits",
+        default="easy",
+    )
+    parser.add_argument(
+        "--llm",
+        type=str,
+        default=None
+    )
+    args = parser.parse_args()
+    print(args)
+    # splits_list = ["human"]
     # splits_list = ["easy_1209", "multi_cons"]
     # splits_list = ["cost", "food", "attraction", "hotel", "transport"]
     # splits_list = ["attraction"]
-    llm = Qwen()
-    for splits in splits_list:
+    llm = Qwen(args.llm)
+    for splits in args.splits:
         run(splits=splits, backbone_llm=llm)

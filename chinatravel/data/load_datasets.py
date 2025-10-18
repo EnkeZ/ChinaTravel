@@ -158,6 +158,7 @@ def load_query(args):
 import argparse
 argparser = argparse.ArgumentParser()
 argparser.add_argument("--splits", type=str, default="easy")
+argparser.add_argument('--oracle_translation', action='store_true')
 
 if __name__ == "__main__":
 
@@ -177,7 +178,8 @@ if __name__ == "__main__":
 
     for uid in query_id_list:
         if uid in query_data:
-            print(uid, query_data[uid])
+            print(uid, query_data[uid]['hard_logic_py'])
+            break
         else:
             raise ValueError(f"{uid} not in query_data")
     
